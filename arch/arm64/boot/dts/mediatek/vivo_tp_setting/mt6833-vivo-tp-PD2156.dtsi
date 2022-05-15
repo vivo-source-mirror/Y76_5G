@@ -1,0 +1,178 @@
+/ {
+	fragment@touch {
+		target-path = "/";
+		__overlay__ {
+			mobileevent {
+				status = "okay";
+				compatible = "vivo,mobile_event";
+				vivo-i2c-event=<1>;
+				vivo-channel-broken=<1>;
+				vivo-click-event=<1>;
+				vivo-unexpected-reset-event=<1>;
+				vivo-log-system=<0>;
+				vivo-prox-near=<1>;
+				vivo-hsync-collect=<1>;
+				vivo-ic-mode=<1>;
+				vivo-int-cost=<1>;
+				vivo-large-press-event=<1>;
+				vivo-multi-touch=<1>;
+				vivo-press-area=<1>;
+				// vivo-edge-reject-fail=<1>;
+				vivo-resume-to-touch=<1>;
+				vivo-handler-cost=<1>;
+				vivo-five-more-touch=<1>;
+			};
+		};
+	};
+};
+
+&pio {
+	pd2156_tp_spi_mode: clk_mode_default {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO97__FUNC_SPI4_CLK>,
+				<PINMUX_GPIO13__FUNC_SPI4_MO>;
+			drive-strength = <4>; // 0:2mA 1:4mA 2:6mA 3:8mA 4:10mA 5:12mA 6:14mA 7:16mA
+		};
+	};
+};
+
+&spi4 {
+	status = "okay";
+	vts_device@0 {
+		compatible = "vivo,ts-spi";
+		status = "okay";
+		reg=<0>;
+		spi-max-frequency = <4800000>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pd2156_tp_spi_mode>;
+		nt36672 {
+			compatible = "novatek,NVT-ts-spi-v2";
+			status = "ok";
+
+			vts-type=<0>;
+			vts-ic-number=<81>;
+			spi-max-frequency = <9600000>;	//4800000,9600000,15000000,19200000
+			novatek,reset-gpio = <&pio 186 0x00>;
+			novatek,irq-gpio = <&pio 14 0x2001>;
+			novatek,cs-gpio = <&pio 98 0x00>;
+			novatek,miso-gpio = <&pio 12 0x00>;
+			sensor-test-key="com.nttouchscreen.mptest:MainActivity:android.intent.action.novatek:0:testResult";
+			lcm-noise-test-key="com.nt36xxxtouchscreen.deltadiff:MainActivity:null:null:null";
+			rawdata-test-key="com.nttouchscreen.getdata:MainActivity:null:null:null";
+			rf-noise-test-key="com.nt36xxxtouchscreen.deltadiff:BspTest:android.intent.action.nvtdeltadiff:0:testResult";
+
+			novatek,swrst-n8-addr = <0x03F0FE>;
+			//vts-incell-panel = <&dsi_nt36675_tm_fhdplus_video &dsi_ft8756_truly_fhdplus_video &dsi_nt36672c_tm657_dsc_fhdplus_video>;
+		};
+
+		ili_9882n {
+			status = "okay";
+			compatible = "tchip,ilitek";
+			vts-type=<0>;
+			vts-ic-number=<91>;
+			spi-max-frequency = <9600000>;
+			touch,reset-gpio = <&pio 186 0x00>;
+			touch,irq-gpio = <&pio 14 0x2001>;
+
+			sensor-test-key="com.ilitek.touchscreen.tptest3X:MP3XActivity:com.ilitek.touchscreen.action.tptest:0:ILITEK_TpTestResult";
+			lcm-noise-test-key="com.ilitek.touchscreen.noisev2:MainActivity:null:null:null";
+			rawdata-test-key="com.ilitek.touchscreen.noisev2:DataShowActivity:null:null:null";
+			rf-noise-test-key="com.ilitek.touchscreen.noisev2:BspTestActivity:com.ilitek.touchscreen.action.noisetest:0:ILITEK_TpTestResult";
+			//vts-incell-panel=<&dsi_pd2034_tm_ili9882n_hdplus_video &dsi_pd2034_inx_ili9882n_hdplus_video>;
+		};
+
+		ft8720 {
+			compatible = "focaltech,ft8756_v2";
+			vts-type=<0>;
+			vts-ic-number=<38>;
+			spi-max-frequency = <6000000>;	//4800000,9600000,15000000,19200000
+			focaltech,ic_name = "ft8720";
+			focaltech,reset-gpio = <&pio 186 0x00>;
+			focaltech,irq-gpio = <&pio 14 0x2001>;
+			focaltech,cs-gpio = <&pio 98 0x00>;
+			focaltech,max-touch-number = <10>;
+			focaltech,display-coords = <0 0 1080 2408>;
+			focaltech,vts-gesture-separate = <1>;
+			focaltech,vts-reset-poweroff = <1>;
+
+			sensor-test-key="com.focaltouchscreen.sensortest:MainActivity:com.focaltouchscreen.sensortest:0:focal_test_result";
+			lcm-noise-test-key="com.focaltech.deltadiff:MainActivity:null:null:null";
+			rawdata-test-key="com.focaltech.deltadiff:DataActivity:null:null:null";
+			rf-noise-test-key="com.focaltech.deltadiff:BspTestActivity:com.focaltech.deltadiff:0:testResult";
+			//vts-incell-panel = <&dsi_pd2073_dj_ft8720_dsc_fhd_120_video>;
+		};
+	};
+
+	tp_module1 {
+		compatible = "vivo,touch-panel-module";
+		vts-ic-number=<81>;
+		vts-type=<0>;
+		vts-lcmid=<19>; // CPD2117 INCELL TM XH SB NT36672C  1211772  lcmid  0x13
+		vts-dimention-x=<1080>;
+		vts-dimention-y=<2408>;
+		vts-tx-sensors=<18>;
+		vts-rx-sensors=<32>;
+		vts-incell=<1>;
+		vts-gesture=<1>;
+		vts-need-caliberation=<0>;
+		vts-virtual-proximinity=<0>;
+		vts-long-press=<0>;
+		vts-module-vendor=<0xF0>;
+		vts-no-flash=<1>;
+		vts-game-mode=<1>;
+		vts-game-idle-time=<10>;
+		vts-report-timestamp=<1>;
+		vts-delay-avee=<200>;
+		vts-set-card-region = <1>; // 支持设置卡包左滑区域设置
+		vts-set-card-region-width = <200>; // 滑动区域宽度，单位为显示像素点
+		vts-game-save-power=<1>; 	// 单独设置报点率
+	};
+
+	tp_module2 {
+		compatible = "vivo,touch-panel-module";
+		vts-ic-number=<91>;
+		vts-type=<0>;
+		vts-lcmid=<65>;// CPD2117 1211799 软ID 0CH DJI	ILI7807S
+		vts-dimention-x=<1080>;
+		vts-dimention-y=<2408>;
+		vts-tx-sensors=<16>;
+		vts-rx-sensors=<36>;
+		vts-incell=<1>;
+ 		vts-need-caliberation=<0>;
+ 		vts-virtual-proximinity=<0>;
+ 		vts-long-press=<0>;
+		vts-module-vendor=<0xF0>;
+		vts-no-flash=<1>;
+		vts-gesture=<1>;
+		vts-game-mode=<1>;
+		vts-game-idle-time=<10>;
+		vts-set-card-region = <1>; // 支持设置卡包左滑区域设置
+		vts-set-card-region-width = <200>; // 滑动区域宽度，单位为显示像素点
+		vts-game-save-power=<1>; 	// 单独设置报点率
+	};
+
+	tp_module3 {
+		compatible = "vivo,touch-panel-module";
+		vts-ic-number=<38>;
+		vts-type=<0>;
+		vts-dimention-x=<1080>;
+		vts-dimention-y=<2408>;
+		vts-tx-sensors=<16>;
+		vts-rx-sensors=<36>;
+		vts-incell=<1>;
+		vts-gesture=<1>;
+		vts-need-caliberation=<0>;
+		vts-virtual-proximinity=<0>;
+		vts-long-press=<0>;
+		vts-module-vendor=<0xC0>;
+		vts-no-flash=<1>;
+		vts-game-mode=<1>;
+		vts-game-idle-time=<10>;
+		vts-report-timestamp=<1>;
+		vts-lcmid=<129>; // CPD2117 INCELL 华星 FT8720	1211794 lcmid 0x81
+		vts-no-flash-unique-code=<1>;
+		vts-set-card-region = <1>; // 支持设置卡包左滑区域设置
+		vts-set-card-region-width = <200>; // 滑动区域宽度，单位为显示像素点
+		//vts-set-blank=<1>;
+	};
+};
